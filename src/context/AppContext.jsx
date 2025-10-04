@@ -193,16 +193,21 @@ export function AppProvider({ children }) {
   }, [stations, filters]);
 
   const toggleFavorite = useCallback(async (station) => {
-    const { addFavorite, removeFavorite } = await import('../utils/db');
-    const isFav = await checkFavorite(station.id);
-    
-    if (isFav) {
-      await removeFavorite(station.id);
-    } else {
-      await addFavorite(station);
+    try {
+      const { addFavorite, removeFavorite, isFavorite } = await import('../utils/db');
+      const isFav = await isFavorite(station.id);
+      
+      if (isFav) {
+        await removeFavorite(station.id);
+      } else {
+        await addFavorite(station);
+      }
+      
+      await loadFavorites();
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      setError('Failed to update favorites');
     }
-    
-    await loadFavorites();
   }, []);
 
   const value = {

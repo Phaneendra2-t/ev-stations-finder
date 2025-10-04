@@ -9,13 +9,17 @@ export default function StationCard({ station, onClose }) {
   const [isFav, setIsFav] = useState(false);
 
   useEffect(() => {
+    const checkFavorite = async () => {
+      try {
+        const fav = await isFavorite(station.id);
+        setIsFav(fav);
+      } catch (error) {
+        console.error('Error checking favorite:', error);
+        setIsFav(false);
+      }
+    };
     checkFavorite();
   }, [station.id]);
-
-  const checkFavorite = async () => {
-    const fav = await isFavorite(station.id);
-    setIsFav(fav);
-  };
 
   const handleNavigate = () => {
     if (!userLocation) {

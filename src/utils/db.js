@@ -4,47 +4,72 @@ const DB_NAME = 'ev-charger-db';
 const DB_VERSION = 1;
 
 export async function initDB() {
-  return openDB(DB_NAME, DB_VERSION, {
-    upgrade(db) {
-      // Store for favorite stations
-      if (!db.objectStoreNames.contains('favorites')) {
-        db.createObjectStore('favorites', { keyPath: 'id' });
-      }
+  try {
+    return await openDB(DB_NAME, DB_VERSION, {
+      upgrade(db) {
+        // Store for favorite stations
+        if (!db.objectStoreNames.contains('favorites')) {
+          db.createObjectStore('favorites', { keyPath: 'id' });
+        }
 
-      // Store for cached station data
-      if (!db.objectStoreNames.contains('stations')) {
-        const stationStore = db.createObjectStore('stations', { keyPath: 'id' });
-        stationStore.createIndex('lastUpdated', 'lastUpdated');
-      }
+        // Store for cached station data
+        if (!db.objectStoreNames.contains('stations')) {
+          const stationStore = db.createObjectStore('stations', { keyPath: 'id' });
+          stationStore.createIndex('lastUpdated', 'lastUpdated');
+        }
 
-      // Store for user preferences
-      if (!db.objectStoreNames.contains('preferences')) {
-        db.createObjectStore('preferences', { keyPath: 'key' });
-      }
-    },
-  });
+        // Store for user preferences
+        if (!db.objectStoreNames.contains('preferences')) {
+          db.createObjectStore('preferences', { keyPath: 'key' });
+        }
+      },
+    });
+  } catch (error) {
+    console.error('Failed to initialize IndexedDB:', error);
+    throw error;
+  }
 }
 
 // Favorites operations
 export async function addFavorite(station) {
-  const db = await initDB();
-  await db.put('favorites', { ...station, addedAt: Date.now() });
+  try {
+    const db = await initDB();
+    await db.put('favorites', { ...station, addedAt: Date.now() });
+  } catch (error) {
+    console.error('Error adding favorite:', error);
+    throw error;
+  }
 }
 
 export async function removeFavorite(stationId) {
-  const db = await initDB();
-  await db.delete('favorites', stationId);
+  try {
+    const db = await initDB();
+    await db.delete('favorites', stationId);
+  } catch (error) {
+    console.error('Error removing favorite:', error);
+    throw error;
+  }
 }
 
 export async function getFavorites() {
-  const db = await initDB();
-  return db.getAll('favorites');
+  try {
+    const db = await initDB();
+    return await db.getAll('favorites');
+  } catch (error) {
+    console.error('Error getting favorites:', error);
+    return [];
+  }
 }
 
 export async function isFavorite(stationId) {
-  const db = await initDB();
-  const favorite = await db.get('favorites', stationId);
-  return !!favorite;
+  try {
+    const db = await initDB();
+    const favorite = await db.get('favorites', stationId);
+    return !!favorite;
+  } catch (error) {
+    console.error('Error checking favorite:', error);
+    return false;
+  }
 }
 
 // Station cache operations
