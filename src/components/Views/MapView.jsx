@@ -2,12 +2,14 @@ import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import { motion } from 'framer-motion';
 import L from 'leaflet';
-import 'leaflet.heat';
 import { useApp } from '../../context/AppContext';
 import StationCard from '../Station/StationCard';
 import FilterPanel from '../Station/FilterPanel';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import { Layers, Filter } from 'lucide-react';
+
+// Import heatmap loader
+import { loadHeatmapPlugin } from '../../utils/loadHeatmap';
 
 // Fix Leaflet default marker icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -66,31 +68,54 @@ function MapController({ center, zoom }) {
 
 function HeatmapLayer({ stations, show }) {
   const map = useMap();
+  const [heatmapLoaded, setHeatmapLoaded] = useState(false);
 
   useEffect(() => {
-    if (!show || !stations.length) return;
+    if (show) {
+      loadHeatmapPlugin().then(loaded => {
+        setHeatmapLoaded(loaded);
+      });
+    }
+  }, [show]);
 
-    const points = stations.map(station => [
-      station.latitude,
-      station.longitude,
-      0.5, // intensity
-    ]);
+  useEffect(() => {
+    if (!show || !stations.length || !heatmapLoaded) return;
+    
+    // Check if L.heatLayer is available
+    if (typeof L.heatLayer !== 'function') {
+      console.warn('Heatmap feature not available');
+      return;
+    }
 
-    const heatLayer = L.heatLayer(points, {
-      radius: 25,
-      blur: 15,
-      maxZoom: 17,
-      gradient: {
-        0.0: '#3b82f6',
-        0.5: '#10b981',
-        1.0: '#ef4444',
-      },
-    }).addTo(map);
+    try {
+      const points = stations.map(station => [
+        station.latitude,
+        station.longitude,
+        0.5, // intensity
+      ]);
 
-    return () => {
-      map.removeLayer(heatLayer);
-    };
-  }, [map, stations, show]);
+      const heatLayer = L.heatLayer(points, {
+        radius: 25,
+        blur: 15,
+        maxZoom: 17,
+        gradient: {
+          0.0: '#3b82f6',
+          0.5: '#10b981',
+          1.0: '#ef4444',
+        },
+      }).addTo(map);
+
+      return () => {
+        try {
+          map.removeLayer(heatLayer);
+        } catch (e) {
+          console.warn('Error removing heatmap layer');
+        }
+      };
+    } catch (error) {
+      console.error('Error creating heatmap:', error);
+    }
+  }, [map, stations, show, heatmapLoaded]);
 
   return null;
 }

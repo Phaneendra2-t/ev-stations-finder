@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="384" height="384" viewBox="0 0 384 384" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="384" height="384" fill="url(#grad)" rx="38.400000000000006"/>
+  
+  <!-- Battery body -->
+  <rect x="96" y="134.39999999999998" width="153.60000000000002" height="134.39999999999998" fill="white" rx="7.68"/>
+  
+  <!-- Battery terminal -->
+  <rect x="153.60000000000002" y="96" width="38.400000000000006" height="38.400000000000006" fill="white" rx="3.84"/>
+  
+  <!-- Lightning bolt -->
+  <path d="M 172.8 153.60000000000002 L 145.92000000000002 201.60000000000002 L 165.12 201.60000000000002 L 134.39999999999998 249.60000000000002 L 165.12 220.79999999999998 L 145.92000000000002 220.79999999999998 Z" fill="#10b981"/>
+</svg>
