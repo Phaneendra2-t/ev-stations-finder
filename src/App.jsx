@@ -5,21 +5,24 @@ import MapView from './components/Views/MapView';
 import ListView from './components/Views/ListView';
 import FavoritesView from './components/Views/FavoritesView';
 import SettingsView from './components/Views/SettingsView';
+import ErrorBoundary from './components/UI/ErrorBoundary';
 
 function App() {
   return (
-    <AppProvider>
-      <Router>
-        <MainLayout>
-          <Routes>
-            <Route path="/" element={<MapView />} />
-            <Route path="/list" element={<ListView />} />
-            <Route path="/favorites" element={<FavoritesView />} />
-            <Route path="/settings" element={<SettingsView />} />
-          </Routes>
-        </MainLayout>
-      </Router>
-    </AppProvider>
+    <ErrorBoundary>
+      <AppProvider>
+        <Router>
+          <MainLayout>
+            <Routes>
+              <Route path="/" element={<MapView />} />
+              <Route path="/list" element={<ListView />} />
+              <Route path="/favorites" element={<FavoritesView />} />
+              <Route path="/settings" element={<SettingsView />} />
+            </Routes>
+          </MainLayout>
+        </Router>
+      </AppProvider>
+    </ErrorBoundary>
   );
 }
 

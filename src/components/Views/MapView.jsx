@@ -130,15 +130,29 @@ export default function MapView() {
     showHeatmap,
     setShowHeatmap,
     isOffline,
+    error,
   } = useApp();
 
   const [showFilters, setShowFilters] = useState(false);
+  const [mapError, setMapError] = useState(null);
+  
   const filteredStations = getFilteredStations();
 
   const defaultCenter = [37.7749, -122.4194]; // San Francisco
   const mapCenter = userLocation
     ? [userLocation.latitude, userLocation.longitude]
     : defaultCenter;
+
+  // Handle map errors
+  useEffect(() => {
+    const handleError = (e) => {
+      console.error('Map error:', e);
+      setMapError('Failed to load map. Please refresh the page.');
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
 
   return (
     <div className="relative h-full w-full">

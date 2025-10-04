@@ -12,6 +12,7 @@ export function AppProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
   const [error, setError] = useState(null);
+  const [isInitialized, setIsInitialized] = useState(false);
   const [filters, setFilters] = useState({
     showLevel2: true,
     showDCFast: true,
@@ -23,8 +24,12 @@ export function AppProvider({ children }) {
   const [viewMode, setViewMode] = useState('map'); // 'map' or 'list'
   const [showHeatmap, setShowHeatmap] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : false;
+    try {
+      const saved = localStorage.getItem('darkMode');
+      return saved ? JSON.parse(saved) : false;
+    } catch {
+      return false;
+    }
   });
 
   // Monitor online/offline status
@@ -221,6 +226,8 @@ export function AppProvider({ children }) {
     isOffline,
     error,
     setError,
+    isInitialized,
+    setIsInitialized,
     filters,
     setFilters,
     viewMode,
